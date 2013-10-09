@@ -1,95 +1,49 @@
-/**
-
-	INTRODUCCIÓN A LA PROGRAMACIÓN / FUNDAMENTOS DE PROGRAMACIÓN
-	Curso 2012/2013
-
-	Nombre: main.cpp
-	Descripción: Implementación del programa principal para el proyecto NenRaya_base
-	     	 	 Encargado del funcionamiento del juego.
-	Autor:	Profesores de las asignaturas
-	Fecha:5/12/2012
-
-*/
 #include "entorno.h"
-#include <iostream>
+#include "tad_tablero.h"
 
-using namespace std;
+int main() {
 
-int main(){
-	  int col=0;  //columna seleccionada
-	  bool salir=false; //controla el final del bucle
-	  TipoTecla tecla=TNada;   //almacena la tecla pulsada
-	  int num_filas, num_columnas;  //dimensiones del tablero
-	  int num_fichas, num_jugadores;  //estas variables cargan información del fichero..
-	  int comodin1,comodin2;		  //de configuración que no se van a utilizar
+	string fichero_configuracion = "gameoflife.cnf";
+	string patron_inicial;
+	int num_filas, num_columnas;  //dimensiones del tablero
+	tablero juego;
+	TipoTecla tecla = TNada;   //almacena la tecla pulsada
 
-	  //Cargar los datos del fichero de configuración
-	  if (!TEntornoCargarConfiguracion(num_filas,
-			  	  	  	  	  	  	   num_columnas,
-			  	  	  	  	  	  	   num_fichas,
-			  	  	  	  	  	  	   num_jugadores,
-			  	  	  	  	  	  	   comodin1, comodin2) ){
-		  cout << "Error al cargar la configuración desde fichero [nenraya.cnf]."  << endl;
-	  	  return false;
-	  	  }
-	  //Inicia el entorno gráfico y dibuja el tablero
-	  if (!TEntornoIniciar (num_filas, num_columnas))
-		  return false;
+	if (!TEntornoCargarConfiguracion(fichero_configuracion, num_filas,
+			num_columnas, patron_inicial))
+		return false;
 
-	  TEntornoMostrarMensaje(Zona2, "Si pulsas Enter se borran las fichas");
+	crear_tablero(juego, num_filas, num_columnas);
+	tablero_leer_patron(juego, patron_inicial);
 
-	  //Coloca la flecha sobre la primera columna
-	  TEntornoActivarColumna (0);
+	if (!TEntornoIniciar(num_filas, num_columnas))
+		return false;
 
-	  //Colocamos cuatro fichas en el tablero
-	  TEntornoPonerCasilla (0,0,1);
-	  TEntornoPonerCasilla (1,1,2);
-	  TEntornoPonerCasilla (2,2,1);
-	  TEntornoPonerCasilla (3,3,2);
+	while (tecla != TSalir) {
+		tecla = TEntornoLeerTeclaSiPulsada();
 
-	  while (!salir){
-	    tecla=TEntornoLeerTecla();
+		switch (tecla) {
 
-	    switch (tecla) {
-	      case TDerecha: //la flecha se desplaza hacia la derecha
-	    	  TEntornoDesactivarColumna(col);
-	    	  if (col < num_columnas-1) col++;
-	    	 	   TEntornoActivarColumna(col);
-	      break;
+		case TEnter:  // comienza el juego de nuevo
+			crear_tablero(juego, num_filas, num_columnas);
+			tablero_leer_patron(juego, "patron3.gol");
+			break;
 
-	      case TIzquierda: //la flecha se desplaza hacia la izquierda
-	    	  TEntornoDesactivarColumna(col);
-	    	  if (col > 0) col--;
-	    	  	   TEntornoActivarColumna(col);
-				break;
+		default:
+			tablero_tick(juego);
+			for (int i = 0; i < num_filas; i++)
+				for (int j = 0; j < num_columnas; j++) {
+					int valor = tablero_valor(juego, i, j);
+					TEntornoPonerCasilla(i, j, valor);
+				}
+			break;
+		}  //Fin del switch
+	}  //fin del while
 
-	      case TEnter:  //se borran las 4 fichas que hay en el tablero
-	    	    TEntornoEliminarCasilla (0,0);
-	    		TEntornoEliminarCasilla (1,1);
-	    		TEntornoEliminarCasilla (2,2);
-	    		TEntornoEliminarCasilla (3,3);
-	    		salir = true;
-				break;
-
-	      case TSalir:
-	    	  	  salir=true;
-   	  	  	  	  break;
-	      default:
-	      	  break;
-	    }//Fin del switch
-
-	  }//fin del while
-
-
-	TEntornoMostrarMensajeFin("      ¡¡¡ A D I O S !!!");
+	TEntornoMostrarMensajeFin("pulsa una tecla para salir");
 	TEntornoLeerTecla();
-    TEntornoTerminar();  //se cierra en entorno gráfico
+	TEntornoTerminar();  //se cierra en entorno gráfico
 
 	return 0;
 }
-
-
-
-
-
 
