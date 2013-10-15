@@ -1,10 +1,23 @@
+/*
+ * Implementación del tad tablero
+ *
+ * Proyecto: gameoflife - Juego de la vida
+ * Autores: profesores de la asignatura
+ * Fecha: octubre de 2013
+ *
+ */
+
+// cabeceras necesarias
 #include "tad_tablero.h"
 
+// librerías necesarias
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
 #include <iostream>
 using namespace std;
+
+// implementación de las operaciones
 
 void crear_tablero(tablero & self, int filas, int columnas) {
 
